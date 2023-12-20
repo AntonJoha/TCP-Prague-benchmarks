@@ -36,9 +36,7 @@ def emptyNet():
 
     info( '*** Running CLI\n' )
     
-    h1.cmd("iperf -s -e > out1 &")
-    time.sleep(1)
-    h2.cmd("iperf -c 10.0.0.1 -e > out2")
+    CLI(net)
 
     info( '*** Stopping network' )
     net.stop()
