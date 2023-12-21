@@ -38,9 +38,9 @@ def emptyNet():
     s2_eth0 = "s2_eth0"
 
     info( '*** Creating links\n' )
-    net.addLink( h1, s1,  fName1=h1_eth0)
-    net.addLink( h2, s2,  fName1=h2_eth0)
-    net.addLink(s2, s1, bw=10, delay="1ms")
+    net.addLink( h1, s1, fname1=h1_eth0)#, bw=500 )
+    net.addLink( h2, s2, fname1=h2_eth0, delay="15ms")#, bw=500)
+    net.addLink(s1, s2 )#, bw=10, delay="15ms")
 
     info( '*** Starting network\n')
     net.start()
@@ -52,25 +52,37 @@ def emptyNet():
 
 
     for intf in s1.intfList():
-        s1.cmd("tc qdisc replace dev %s root handle 1: dualpi2 target 15ms tupdate 16ms alpha 0.156250 beta 3.195312 l4s_ect coupling_factor 2 drop_on_overload step_thresh 1ms drop_dequeue split_gso classic_protection 10%% limit 100" % intf)
+        #s1.cmd("tc qdisct del dev %s root" % intf)
+        s1.cmd("tc qdisc add dev %s root handle 1: tbf rate 50mbit burst 1514 latency 2000ms" % intf)
+        #s1.cmd("tc qdisc add dev %s root parent 1: pfifo limit 1000" % intf)
+        s1.cmd("tc qdisc add dev %s parent 1: handle 110: dualpi2 target 15ms tupdate 16ms alpha 0.156250 beta 3.195312 l4s_ect coupling_factor 2 drop_on_overload step_thresh 1ms drop_dequeue split_gso classic_protection 10%% limit 10000 2> out_%s" % (intf, intf))
+        #s1.cmd("tc qdisc add dev %s root netem limit 1000 delay 15ms")
 
     for intf in s2.intfList():
-        s2.cmd("tc qdisc replace dev %s root handle 1: dualpi2 target 15ms tupdate 16ms alpha 0.156250 beta 3.195312 l4s_ect coupling_factor 2 drop_on_overload step_thresh 1ms drop_dequeue split_gso classic_protection 10%% limit 100" % intf)
+        #s2.cmd("tc qdisct del dev %s root" % intf)
+        s2.cmd("tc qdisc add dev %s root handle 1: tbf rate 50mbit burst 1514 latency 2000ms" % intf)
+        s2.cmd("tc qdisc add dev %s parent 1: handle 110: dualpi2 target 15ms tupdate 16ms alpha 0.156250 beta 3.195312 l4s_ect coupling_factor 2 drop_on_overload step_thresh 1ms drop_dequeue split_gso classic_protection 10%% limit 10000" % intf)
+        #s2.cmd("tc qdisc add dev %s root netem limit 1000 delay 15ms")
+        #s2.cmd("tc qdisc add dev %s root parent 1: pfifo limit 1000" % intf)
 
     s1.cmd("tc qdisc > settings")
 
     time.sleep(1)
 
+
+
     info("*** Hello")
 
     h1.cmd("tcpdump -w capture_h1_%s.pcap &" % timestamp)
-    h2.cmd("tcpdump -w capture_h2_%s.pcap &" % timestamp)
+    #h2.cmd("tcpdump -w capture_h2_%s.pcap &" % timestamp)
     info("*** TCPDUMP started")
 
     h1.cmd("iperf -s -e > h1_dualpi &")
     time.sleep(1)
-    h2.cmd("iperf -c 10.0.0.1 -e -t 69 > h2_dualpi")
 
+    #h2.cmd("iperf -c 10.0.0.1 -e -t 60 &")
+    h2.cmd("iperf -c 10.0.0.1 -e -t 60 &")
+    h2.cmd("iperf -c 10.0.0.1 -e -t 60 > h2_dualpi")
     info("DONE")
     h1.cmd("killall iperf")
     time.sleep(1)
