@@ -1,0 +1,9 @@
+qdisc tbf 1: dev lo root refcnt 2 rate 50Mbit burst 1512b lat 20ms 
+qdisc dualpi2 110: dev lo parent 1: limit 10000p target 15ms tupdate 16ms alpha 0.152344 beta 3.187500 l4s_ect coupling_factor 2 drop_on_overload step_thresh 1ms drop_dequeue split_gso classic_protection 10% 
+qdisc pfifo_fast 0: dev enp0s3 root refcnt 2 bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+qdisc netem 10: dev s1-eth1 root refcnt 2 limit 1000 delay 30ms
+qdisc tbf 1: dev s2-eth1 root refcnt 2 rate 50Mbit burst 1512b lat 20ms 
+qdisc dualpi2 110: dev s2-eth1 parent 1: limit 10000p target 15ms tupdate 16ms alpha 0.152344 beta 3.187500 l4s_ect coupling_factor 2 drop_on_overload step_thresh 1ms drop_dequeue split_gso classic_protection 10% 
+qdisc tbf 1: dev s2-eth2 root refcnt 2 rate 50Mbit burst 1512b lat 20ms 
+qdisc dualpi2 110: dev s2-eth2 parent 1: limit 10000p target 15ms tupdate 16ms alpha 0.152344 beta 3.187500 l4s_ect coupling_factor 2 drop_on_overload step_thresh 1ms drop_dequeue split_gso classic_protection 10% 
+qdisc noqueue 0: dev s1-eth2 root refcnt 2 
