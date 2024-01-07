@@ -1,4 +1,4 @@
-from run_experiment import run_experiment, get_dualpi2_params, run_burst_experiment
+from run_experiment import *
 import plotperf
 import numpy as np
 
@@ -52,7 +52,7 @@ def varying_burst_test(low=0, high=50):
     for i in np.arange(low,high,1):
         outfile = "result/%s_burst" % i
         outfiles.append([outfile, i])
-       # run_burst_experiment(params, outfile=outfile, num_flows=i, iperf_time=20)
+        run_burst_experiment(params, outfile=outfile, num_flows=i, iperf_time=20)
         plotperf.iperf_plot(outfile,
                             title=str(i),
                             outfile="%s_band_burst.png" % outfile,
@@ -66,4 +66,56 @@ def varying_burst_test(low=0, high=50):
                             param=plotperf.PlotType.RTT)
     plotperf.histogram(outfiles, param=plotperf.PlotType.Bandwidth, outfile="bandwidth.png", ylabel="Bandwidth (Bps)")
     plotperf.histogram(outfiles, param=plotperf.PlotType.RTT, outfile="RTT.png", ylabel="RTT (us)")
-varying_burst_test(0, 50)
+
+def varying_long_test(low=0, high=25):
+    params = get_dualpi2_params()
+
+    outfiles = []
+
+    for i in np.arange(low,high,1):
+        outfile = "result/%s_burst" % i
+        outfiles.append([outfile, i])
+        run_long_flows_experiment(params, outfile=outfile, num_flows=i, iperf_time=20)
+        plotperf.iperf_plot(outfile,
+                            title=str(i),
+                            outfile="%s_band_long.png" % outfile,
+                            param=plotperf.PlotType.Bandwidth,
+                            ylabel="Throughput (MBps)",
+                            scaler=plotperf.mega_scaler)
+        plotperf.iperf_plot(outfile,
+                            title=str(i),
+                            outfile="%s_rtt_long.png" % outfile,
+                            ylabel="RTT (us)",
+                            param=plotperf.PlotType.RTT)
+    plotperf.histogram(outfiles, param=plotperf.PlotType.Bandwidth, outfile="bandwidth.png", ylabel="Throughput (Bps)")
+    plotperf.histogram(outfiles, param=plotperf.PlotType.RTT, outfile="RTT.png", ylabel="RTT (us)")
+
+
+def long_against_short(low=0, high=25):
+    params = get_dualpi2_params()
+
+    outfiles = []
+
+    for i in np.arange(low,high,1):
+        outfile = "result/%s_LvsS" % i
+        outfiles.append([outfile, i])
+        run_long_against_short(params, outfile=outfile, num_flows=i, iperf_time=20)
+        plotperf.iperf_plot(outfile,
+                            title=str(i),
+                            outfile="%s_band_LvsS.png" % outfile,
+                            param=plotperf.PlotType.Bandwidth,
+                            ylabel="Throughput (MBps)",
+                            scaler=plotperf.mega_scaler)
+        plotperf.iperf_plot(outfile,
+                            title=str(i),
+                            outfile="%s_rtt_LvsS.png" % outfile,
+                            ylabel="RTT (us)",
+                            param=plotperf.PlotType.RTT)
+    plotperf.histogram(outfiles, param=plotperf.PlotType.Bandwidth, outfile="bandwidth.png", ylabel="Throughput (Bps)")
+    plotperf.histogram(outfiles, param=plotperf.PlotType.RTT, outfile="RTT.png", ylabel="RTT (us)")
+
+
+
+
+
+long_against_short(0,25)

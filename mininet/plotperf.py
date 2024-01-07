@@ -67,7 +67,11 @@ def _make_dict(filename) -> List[Dict[str, float]]:
         lines = lines[1:]
     lines = lines[1:]
     for i in lines:
-        measurements.append(_handle_line(i))
+        try:
+            l = _handle_line(i)
+            measurements.append(l)
+        except:
+            print("nej")
 
     return measurements[:-1]
 
@@ -81,7 +85,12 @@ def _get_last(filename) -> List[Dict[str,float]]:
         lines = lines[1:]
     lines = lines[1:]
     for i in lines:
-        measurements.append(_handle_line(i))
+        try:
+            l = _handle_line(i)
+            measurements.append(l)
+        except:
+            print(":(")
+
 
     return measurements[-1]
 
